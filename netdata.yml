@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: netdata
+spec:
+  replicas: 1
+  selector:
+    app: netdata
+  template:
+    metadata:
+      labels:
+        app: netdata
+    spec:
+      containers:
+      - name: netdata
+        image: titpetric/netdata
+        ports:
+        - containerPort: 19999
+        securityContext:
+          capabilities:
+            add:
+              - SYS_PTRACE
+        volumeMounts:
+        - mountPath: /host/proc
+          name: proc
+          readOnly: true
+        - mountPath: /host/sys
+          name: sys
+          readOnly: true
+      volumes:
+      - name: sys
+        hostPath:
+          path: /sys
+      - name: proc
+        hostPath:
+          path: /proc
